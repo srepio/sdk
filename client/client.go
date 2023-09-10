@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -35,7 +36,7 @@ func NewClient(opts *ClientOptions) *Client {
 	}
 }
 
-func (c *Client) get(path string, params map[string]string) (*http.Response, error) {
+func (c *Client) get(path string, params map[string]string, data any) (*http.Response, error) {
 	req := &http.Request{
 		Method: http.MethodGet,
 		URL: &url.URL{
@@ -50,10 +51,10 @@ func (c *Client) get(path string, params map[string]string) (*http.Response, err
 	}
 	req.URL.RawQuery = query.Encode()
 
-	return c.request(req)
+	return c.request(req, data)
 }
 
-func (c *Client) post(path string, body []byte) (*http.Response, error) {
+func (c *Client) post(path string, body []byte, data any) (*http.Response, error) {
 	req := &http.Request{
 		Method: http.MethodPost,
 		URL: &url.URL{
@@ -65,16 +66,31 @@ func (c *Client) post(path string, body []byte) (*http.Response, error) {
 	}
 	req.Header.Add("Content-Type", "application/json")
 
-	return c.request(req)
+	return c.request(req, data)
 }
 
-func (c *Client) request(req *http.Request) (*http.Response, error) {
+func (c *Client) request(req *http.Request, data any) (*http.Response, error) {
 	if c.Token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
 	}
 	resp, err := c.hc.Do(req)
-	if resp.StatusCode > 299 {
-		err = fmt.Errorf("status code: %d", resp.StatusCode)
+	if err != nil {
+		return resp, err
 	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode > 299 {
+		return resp, fmt.Errorf("status code: %d", resp.StatusCode)
+	}
+
+	bout, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(bout, data); err != nil {
+		return resp, err
+	}
+
 	return resp, err
 }
