@@ -14,7 +14,7 @@ type CreateUserRequest struct {
 }
 
 type CreateUserResponse struct {
-	User *types.User
+	User *types.User `json:"user"`
 }
 
 type LoginRequest struct {
@@ -23,8 +23,8 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	User  *types.User
-	Token string
+	User  *types.User `json:"user"`
+	Token string      `json:"token"`
 }
 
 func (c *Client) CreateUser(ctx context.Context, req *CreateUserRequest) (*CreateUserResponse, error) {
