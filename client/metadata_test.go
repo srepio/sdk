@@ -16,3 +16,15 @@ func TestMetadataGet(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestScenarioFind(t *testing.T) {
+	client := NewClient(&ClientOptions{
+		Url: "api.srep.io",
+	})
+
+	_, err := client.FindScenario(context.Background(), "mango")
+
+	if err != nil {
+		t.Error(err)
+	}
+}

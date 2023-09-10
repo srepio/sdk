@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -37,5 +38,35 @@ func (c *Client) GetMetadata(ctx context.Context) (*GetMetadataResponse, error) 
 
 	return &GetMetadataResponse{
 		Scenarios: md,
+	}, nil
+}
+
+type GetScenarioResponse struct {
+	Scenario *types.Scenario `json:"scenario"`
+}
+
+// Get all scenarioa metdata
+func (c *Client) FindScenario(ctx context.Context, name string) (*GetScenarioResponse, error) {
+	resp, err := c.get(fmt.Sprintf("/metadata/%s", name), map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("error getting resource")
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	s := &types.Scenario{}
+	if err := json.Unmarshal(body, s); err != nil {
+		return nil, err
+	}
+
+	return &GetScenarioResponse{
+		Scenario: s,
 	}, nil
 }
