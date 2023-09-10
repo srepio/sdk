@@ -12,7 +12,7 @@ import (
 )
 
 type GetMetadataResponse struct {
-	Scenarios *types.Metadata `json:"metadata"`
+	Scenarios *types.Metadata `json:"scenarios"`
 }
 
 // Get all scenarioa metdata
