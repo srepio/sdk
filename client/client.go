@@ -1,7 +1,9 @@
 package client
 
 import (
+	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -19,7 +21,7 @@ type ClientOptions struct {
 
 func NewClient(opts *ClientOptions) *Client {
 	if opts.Url == "" {
-		opts.Url = "https://api.srep.io/"
+		opts.Url = "api.srep.io"
 	}
 
 	return &Client{
@@ -29,4 +31,29 @@ func NewClient(opts *ClientOptions) *Client {
 			Timeout: opts.Timeout,
 		},
 	}
+}
+
+func (c *Client) get(path string, params map[string]string) (*http.Response, error) {
+	req := &http.Request{
+		Method: http.MethodGet,
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   c.Url,
+			Path:   path,
+		},
+	}
+	query := req.URL.Query()
+	for key, val := range params {
+		query.Add(key, val)
+	}
+	req.URL.RawQuery = query.Encode()
+
+	return c.request(req)
+}
+
+func (c *Client) request(req *http.Request) (*http.Response, error) {
+	if c.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
+	}
+	return c.hc.Do(req)
 }
