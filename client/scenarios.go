@@ -11,13 +11,13 @@ import (
 	"github.com/srepio/sdk/types"
 )
 
-type GetMetadataResponse struct {
+type GetscenariosResponse struct {
 	Scenarios *types.Metadata `json:"scenarios"`
 }
 
-// Get all scenarioa metdata
-func (c *Client) GetMetadata(ctx context.Context) (*GetMetadataResponse, error) {
-	resp, err := c.get("/metadata", map[string]string{})
+// Get all scenarios
+func (c *Client) Getscenarios(ctx context.Context) (*GetscenariosResponse, error) {
+	resp, err := c.get("/scenarios", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Client) GetMetadata(ctx context.Context) (*GetMetadataResponse, error) 
 		return nil, err
 	}
 
-	md := &GetMetadataResponse{}
+	md := &GetscenariosResponse{}
 	if err := json.Unmarshal(body, md); err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ type FindScenarioResponse struct {
 
 // Get all scenarioa metdata
 func (c *Client) FindScenario(ctx context.Context, name string) (*FindScenarioResponse, error) {
-	resp, err := c.get(fmt.Sprintf("/metadata/%s", name), map[string]string{})
+	resp, err := c.get(fmt.Sprintf("/scenarios/%s", name), map[string]string{})
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,9 @@
 package client
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -51,9 +53,28 @@ func (c *Client) get(path string, params map[string]string) (*http.Response, err
 	return c.request(req)
 }
 
+func (c *Client) post(path string, body []byte) (*http.Response, error) {
+	req := &http.Request{
+		Method: http.MethodPost,
+		URL: &url.URL{
+			Scheme: "https",
+			Host:   c.Url,
+			Path:   path,
+		},
+		Body: io.NopCloser(bytes.NewReader(body)),
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	return c.request(req)
+}
+
 func (c *Client) request(req *http.Request) (*http.Response, error) {
 	if c.Token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
 	}
-	return c.hc.Do(req)
+	resp, err := c.hc.Do(req)
+	if resp.StatusCode > 299 {
+		err = fmt.Errorf("status code: %d", resp.StatusCode)
+	}
+	return resp, err
 }

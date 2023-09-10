@@ -2,7 +2,10 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 
 	"github.com/srepio/sdk/types"
 )
@@ -32,7 +35,26 @@ type LoginResponse struct {
 }
 
 func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
-	return nil, errors.New("not implemented yet")
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.post("/auth/login", body)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	bs, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	out := &LoginResponse{}
+	if err := json.Unmarshal(bs, out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 type MeResponse struct {
@@ -40,5 +62,22 @@ type MeResponse struct {
 }
 
 func (c *Client) Me(ctx context.Context) (*MeResponse, error) {
-	return nil, errors.New("not implemented yet")
+	resp, err := c.get("/auth/me", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	fmt.Println(resp.StatusCode)
+
+	bs, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	me := &MeResponse{}
+	if err := json.Unmarshal(bs, me); err != nil {
+		return nil, err
+	}
+	return me, nil
 }

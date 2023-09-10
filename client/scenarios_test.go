@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestMetadataGet(t *testing.T) {
+func TestGetScenarios(t *testing.T) {
 	client := NewClient(&ClientOptions{
 		Url: "api.srep.io",
 	})
 
-	_, err := client.GetMetadata(context.Background())
+	_, err := client.Getscenarios(context.Background())
 
 	if err != nil {
 		t.Error(err)
