@@ -6,8 +6,8 @@ import (
 )
 
 type StartPlayRequest struct {
-	Scenario string `json:"scenario"`
-	Driver   string `json:"driver"`
+	Scenario string `json:"scenario" validate:"required"`
+	Driver   string `json:"driver" validate:"required"`
 }
 
 type StartPlayResponse struct {
@@ -28,7 +28,7 @@ func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPl
 }
 
 type CompletePlayRequest struct {
-	ID int `json:"id"`
+	ID int `json:"id" validate:"required"`
 }
 
 type CompletePlayResponse struct{}
