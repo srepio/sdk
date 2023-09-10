@@ -17,6 +17,10 @@ type CreateUserResponse struct {
 	User *types.User `json:"user"`
 }
 
+func (c *Client) CreateUser(ctx context.Context, req *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, errors.New("not implemented yet")
+}
+
 type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
@@ -27,10 +31,14 @@ type LoginResponse struct {
 	Token string      `json:"token"`
 }
 
-func (c *Client) CreateUser(ctx context.Context, req *CreateUserRequest) (*CreateUserResponse, error) {
+func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
 	return nil, errors.New("not implemented yet")
 }
 
-func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
+type MeResponse struct {
+	User *types.User `json:"user"`
+}
+
+func (c *Client) Me(ctx context.Context) (*MeResponse, error) {
 	return nil, errors.New("not implemented yet")
 }
