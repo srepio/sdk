@@ -31,22 +31,20 @@ func (c *Client) GetMetadata(ctx context.Context) (*GetMetadataResponse, error) 
 		return nil, err
 	}
 
-	md := &types.Metadata{}
+	md := &GetMetadataResponse{}
 	if err := json.Unmarshal(body, md); err != nil {
 		return nil, err
 	}
 
-	return &GetMetadataResponse{
-		Scenarios: md,
-	}, nil
+	return md, nil
 }
 
-type GetScenarioResponse struct {
+type FindScenarioResponse struct {
 	Scenario *types.Scenario `json:"scenario"`
 }
 
 // Get all scenarioa metdata
-func (c *Client) FindScenario(ctx context.Context, name string) (*GetScenarioResponse, error) {
+func (c *Client) FindScenario(ctx context.Context, name string) (*FindScenarioResponse, error) {
 	resp, err := c.get(fmt.Sprintf("/metadata/%s", name), map[string]string{})
 	if err != nil {
 		return nil, err
@@ -61,12 +59,10 @@ func (c *Client) FindScenario(ctx context.Context, name string) (*GetScenarioRes
 		return nil, err
 	}
 
-	s := &types.Scenario{}
+	s := &FindScenarioResponse{}
 	if err := json.Unmarshal(body, s); err != nil {
 		return nil, err
 	}
 
-	return &GetScenarioResponse{
-		Scenario: s,
-	}, nil
+	return s, nil
 }
