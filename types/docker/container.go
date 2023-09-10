@@ -7,4 +7,5 @@ type Container struct {
 	Ports      []Port
 	Volumes    []Volume
 	Privileged bool
+	PlayID     string
 }
