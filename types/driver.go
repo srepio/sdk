@@ -4,13 +4,16 @@ import "context"
 
 type Driver interface {
 	// Create a new instance of the scenario
-	Create(Scenario) (Instance, error)
+	Create(Scenario, *int64) (Instance, error)
 	// Run a new instance
-	Run(context.Context, Instance) error
+	// Pass it the instance and the play id
+	Run(context.Context, Instance, int64) error
 	// Get the connection command
 	ConnectionCommand(Instance) string
 	// Kill and remove the instance
-	Kill(context.Context, Instance) error
+	// Return the play id and an error
+	Kill(context.Context, Instance) (int64, error)
 	// Check the work in the instance
-	Check(context.Context, Instance) bool
+	// Return the play id and an error
+	Check(context.Context, Instance) (int64, bool)
 }
