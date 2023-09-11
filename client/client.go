@@ -64,6 +64,7 @@ func (c *Client) post(path string, body []byte, data any) (*http.Response, error
 		},
 		Body: io.NopCloser(bytes.NewReader(body)),
 	}
+	req.Header = http.Header{}
 	req.Header.Add("Content-Type", "application/json")
 
 	return c.request(req, data)
