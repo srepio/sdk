@@ -4,7 +4,7 @@ import "context"
 
 type Driver interface {
 	// Create a new instance of the scenario
-	Create(Scenario, *int64) (Instance, error)
+	Create(Scenario) (Instance, error)
 	// Run a new instance
 	// Pass it the instance and the play id
 	Run(context.Context, Instance, int64) error
