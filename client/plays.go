@@ -33,13 +33,13 @@ type CompletePlayRequest struct {
 
 type CompletePlayResponse struct{}
 
-func (c *Client) CompletePlay(ctx context.Context, req *StartPlayRequest) (*StartPlayResponse, error) {
+func (c *Client) CompletePlay(ctx context.Context, req *CompletePlayRequest) (*CompletePlayResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &StartPlayResponse{}
+	out := &CompletePlayResponse{}
 	if _, err := c.post("/plays/complete", body, out); err != nil {
 		return nil, err
 	}
