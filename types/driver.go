@@ -15,5 +15,5 @@ type Driver interface {
 	Kill(context.Context, Instance) (int64, error)
 	// Check the work in the instance
 	// Return the play id and an error
-	Check(context.Context, Instance) (int64, bool)
+	Check(context.Context, Instance) bool
 }
