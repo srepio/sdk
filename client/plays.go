@@ -11,7 +11,7 @@ type StartPlayRequest struct {
 }
 
 type StartPlayResponse struct {
-	ID int64 `json:"id"`
+	ID string `json:"id"`
 }
 
 func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPlayResponse, error) {
@@ -28,7 +28,7 @@ func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPl
 }
 
 type CompletePlayRequest struct {
-	ID int64 `json:"id" validate:"required"`
+	ID string `json:"id" validate:"required"`
 }
 
 type CompletePlayResponse struct{}
