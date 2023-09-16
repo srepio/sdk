@@ -2,6 +2,13 @@ package types
 
 import "context"
 
+const (
+	DockerDriver     DriverName = "docker"
+	KubernetesDriver DriverName = "k8s"
+)
+
+type DriverName string
+
 type Driver interface {
 	// Create a new instance of the scenario
 	Create(Scenario) (Instance, error)
