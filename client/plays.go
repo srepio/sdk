@@ -45,3 +45,22 @@ func (c *Client) CompletePlay(ctx context.Context, req *CompletePlayRequest) (*C
 	}
 	return out, nil
 }
+
+type FailedPlayRequest struct {
+	ID string `json:"id" validate:"required"`
+}
+
+type FailedPlayResponse struct{}
+
+func (c *Client) FailPlay(ctx context.Context, req *FailedPlayRequest) (*FailedPlayResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	out := &FailedPlayResponse{}
+	if _, err := c.post("/plays/fail", body, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
