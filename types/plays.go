@@ -1,7 +1,9 @@
 package types
 
+type PlayStatus string
+
 const (
-	PlayRunning   string = "RUNNING"
-	PlayCompleted string = "COMPLETED"
-	PlayFailed    string = "FAILED"
+	PlayRunning   PlayStatus = "RUNNING"
+	PlayCompleted PlayStatus = "COMPLETED"
+	PlayFailed    PlayStatus = "FAILED"
 )
