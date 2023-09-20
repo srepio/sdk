@@ -3,11 +3,21 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"regexp"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type StartPlayRequest struct {
 	Scenario string `json:"scenario" validate:"required"`
 	Driver   string `json:"driver" validate:"required"`
+}
+
+func (r StartPlayRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Scenario, validation.Required),
+		validation.Field(&r.Driver, validation.Required),
+	)
 }
 
 type StartPlayResponse struct {
@@ -31,6 +41,12 @@ type CompletePlayRequest struct {
 	ID string `json:"id" validate:"required"`
 }
 
+func (r CompletePlayRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
+	)
+}
+
 type CompletePlayResponse struct{}
 
 func (c *Client) CompletePlay(ctx context.Context, req *CompletePlayRequest) (*CompletePlayResponse, error) {
@@ -48,6 +64,12 @@ func (c *Client) CompletePlay(ctx context.Context, req *CompletePlayRequest) (*C
 
 type FailedPlayRequest struct {
 	ID string `json:"id" validate:"required"`
+}
+
+func (r FailedPlayRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
+	)
 }
 
 type FailedPlayResponse struct{}
