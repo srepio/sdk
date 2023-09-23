@@ -1,7 +1,9 @@
 package client
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -112,4 +114,42 @@ func TestLoginRequestValidation(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLogin(t *testing.T) {
+	cases := []apiTestCase{
+		{
+			Url:  "/auth/login",
+			Code: http.StatusOK,
+			Body: `{ "user": {
+                    "id": "f41ffd64-e726-4f5b-8b59-190be848014d",
+                    "name": "Henry Whitaker",
+                    "email": "henrywhitaker3@outlook.com"
+                },
+                "token": "bongo"
+            }`,
+		},
+		{
+			Url:    "/auth/login",
+			Code:   http.StatusUnauthorized,
+			Body:   `{}`,
+			Errors: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("login_%v", tc), func(t *testing.T) {
+			s, c := tc.Prepare(t)
+			defer s.Close()
+
+			_, err := c.Login(context.Background(), &LoginRequest{})
+
+			if tc.Errors {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
+
 }

@@ -11,25 +11,27 @@ import (
 )
 
 type Client struct {
-	hc    *http.Client
-	Url   string
-	Token string
+	hc      *http.Client
+	Options *ClientOptions
 }
 
 type ClientOptions struct {
 	Timeout time.Duration
 	Token   string
 	Url     string
+	Scheme  string
 }
 
 func NewClient(opts *ClientOptions) *Client {
 	if opts.Url == "" {
 		opts.Url = "api.srep.io"
 	}
+	if opts.Scheme == "" {
+		opts.Scheme = "https"
+	}
 
 	return &Client{
-		Url:   opts.Url,
-		Token: opts.Token,
+		Options: opts,
 		hc: &http.Client{
 			Timeout: opts.Timeout,
 		},
@@ -40,8 +42,8 @@ func (c *Client) get(path string, params map[string]string, data any) (*http.Res
 	req := &http.Request{
 		Method: http.MethodGet,
 		URL: &url.URL{
-			Scheme: "https",
-			Host:   c.Url,
+			Scheme: c.Options.Scheme,
+			Host:   c.Options.Url,
 			Path:   path,
 		},
 	}
@@ -58,21 +60,22 @@ func (c *Client) post(path string, body []byte, data any) (*http.Response, error
 	req := &http.Request{
 		Method: http.MethodPost,
 		URL: &url.URL{
-			Scheme: "https",
-			Host:   c.Url,
+			Scheme: c.Options.Scheme,
+			Host:   c.Options.Url,
 			Path:   path,
 		},
 		Body: io.NopCloser(bytes.NewReader(body)),
 	}
 	req.Header = http.Header{}
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
 
 	return c.request(req, data)
 }
 
 func (c *Client) request(req *http.Request, data any) (*http.Response, error) {
-	if c.Token != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Token))
+	if c.Options.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
 	}
 	resp, err := c.hc.Do(req)
 	if err != nil {
