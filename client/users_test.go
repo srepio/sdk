@@ -142,8 +142,8 @@ func TestLogin(t *testing.T) {
 			s, c := tc.Prepare(t)
 			defer s.Close()
 
-			_, err := c.Login(context.Background(), &LoginRequest{})
-
+			resp, err := c.Login(context.Background(), &LoginRequest{})
+			fmt.Println(resp)
 			if tc.Errors {
 				assert.Error(t, err)
 			} else {
@@ -151,5 +151,57 @@ func TestLogin(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestRegister(t *testing.T) {
+	cases := []apiTestCase{
+		{
+			Url:  "/auth",
+			Code: http.StatusOK,
+			Body: `{
+                "user": {
+                    "id": "6aac65e9-17d2-4a34-8503-490138aa3ed5",
+                    "name": "Henry Whitaker",
+                    "email": "henrywhitaker34@outlook.com"
+                }
+            }`,
+		},
+		{
+			Url:  "/auth",
+			Code: http.StatusUnprocessableEntity,
+			Body: `{
+                "message": "Request failed validation",
+                "errors": {
+                    "password": "cannot be blank"
+                }
+            }`,
+			Errors: true,
+		},
+		{
+			Url:  "/auth",
+			Code: http.StatusUnprocessableEntity,
+			Body: `{
+                "message": "Request failed validation",
+                "errors": {
+                    "email": "user henrywhitaker3@outlook.com already exists"
+                }
+            }`,
+			Errors: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("register_%v", tc), func(t *testing.T) {
+			s, c := tc.Prepare(t)
+			defer s.Close()
+
+			resp, err := c.CreateUser(context.Background(), &CreateUserRequest{})
+			fmt.Println(resp)
+			if tc.Errors {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
 }

@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -29,7 +28,16 @@ type CreateUserResponse struct {
 }
 
 func (c *Client) CreateUser(ctx context.Context, req *CreateUserRequest) (*CreateUserResponse, error) {
-	return nil, errors.New("not implemented yet")
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	out := &CreateUserResponse{}
+	if _, err := c.post("/auth", body, out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 type LoginRequest struct {
