@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/srepio/sdk/types"
 )
 
 type StartPlayRequest struct {
@@ -82,6 +83,24 @@ func (c *Client) FailPlay(ctx context.Context, req *FailedPlayRequest) (*FailedP
 
 	out := &FailedPlayResponse{}
 	if _, err := c.post("/plays/fail", body, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+type GetPlaysRequest struct{}
+
+func (r GetPlaysRequest) Validate() error {
+	return validation.ValidateStruct(&r)
+}
+
+type GetPlaysResponse struct {
+	Plays []types.Play `json:"plays"`
+}
+
+func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysResponse, error) {
+	out := &GetPlaysResponse{}
+	if _, err := c.get("/plays", nil, out); err != nil {
 		return nil, err
 	}
 	return out, nil

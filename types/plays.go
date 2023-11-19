@@ -7,3 +7,5 @@ const (
 	PlayCompleted PlayStatus = "COMPLETED"
 	PlayFailed    PlayStatus = "FAILED"
 )
+
+type Play struct{}
