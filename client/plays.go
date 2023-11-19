@@ -95,7 +95,7 @@ func (r GetPlaysRequest) Validate() error {
 }
 
 type GetPlaysResponse struct {
-	Plays []types.Play `json:"plays"`
+	Plays []*types.Play `json:"plays"`
 }
 
 func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysResponse, error) {
