@@ -23,6 +23,7 @@ func (c *Client) Getscenarios(ctx context.Context) (*GetscenariosResponse, error
 
 type FindScenarioResponse struct {
 	Scenario *types.Scenario `json:"scenario"`
+	History  []*types.Play   `json:"history,omitempty"`
 }
 
 // Get all scenarioa metdata
