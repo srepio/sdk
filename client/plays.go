@@ -11,13 +11,11 @@ import (
 
 type StartPlayRequest struct {
 	Scenario string `json:"scenario" validate:"required"`
-	Driver   string `json:"driver" validate:"required"`
 }
 
 func (r StartPlayRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Scenario, validation.Required),
-		validation.Field(&r.Driver, validation.Required),
 	)
 }
 

@@ -19,22 +19,13 @@ func TestStartPlayRequestValidation(t *testing.T) {
 	cases := []testCase{
 		{
 			request: StartPlayRequest{
-				Driver:   "bongo",
 				Scenario: "bongo",
 			},
 			passes: true,
 		},
 		{
-			request: StartPlayRequest{
-				Driver: "bongo",
-			},
-			passes: false,
-		},
-		{
-			request: StartPlayRequest{
-				Scenario: "bongo",
-			},
-			passes: false,
+			request: StartPlayRequest{},
+			passes:  false,
 		},
 		{
 			request: StartPlayRequest{},
@@ -43,7 +34,7 @@ func TestStartPlayRequestValidation(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		t.Run(fmt.Sprintf("start_play_validation_%s_%s_%t", c.request.Scenario, c.request.Driver, c.passes), func(t *testing.T) {
+		t.Run(fmt.Sprintf("start_play_validation_%s_%t", c.request.Scenario, c.passes), func(t *testing.T) {
 			err := c.request.Validate()
 			if c.passes {
 				assert.Nil(t, err)
