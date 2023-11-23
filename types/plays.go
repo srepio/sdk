@@ -3,6 +3,7 @@ package types
 type PlayStatus string
 
 const (
+	PlayPending   PlayStatus = "PENDING"
 	PlayRunning   PlayStatus = "RUNNING"
 	PlayCompleted PlayStatus = "COMPLETED"
 	PlayFailed    PlayStatus = "FAILED"
