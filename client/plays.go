@@ -36,51 +36,51 @@ func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPl
 	return out, nil
 }
 
-type CompletePlayRequest struct {
+type CheckPlayRequest struct {
 	ID string `json:"id" validate:"required"`
 }
 
-func (r CompletePlayRequest) Validate() error {
+func (r CheckPlayRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
 	)
 }
 
-type CompletePlayResponse struct{}
+type CheckPlayResponse struct{}
 
-func (c *Client) CompletePlay(ctx context.Context, req *CompletePlayRequest) (*CompletePlayResponse, error) {
+func (c *Client) CompletePlay(ctx context.Context, req *CheckPlayRequest) (*CheckPlayResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &CompletePlayResponse{}
-	if _, err := c.post("/plays/complete", body, out); err != nil {
+	out := &CheckPlayResponse{}
+	if _, err := c.post("/plays/check", body, out); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-type FailedPlayRequest struct {
+type CancelPlayRequest struct {
 	ID string `json:"id" validate:"required"`
 }
 
-func (r FailedPlayRequest) Validate() error {
+func (r CancelPlayRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
 	)
 }
 
-type FailedPlayResponse struct{}
+type CancelPlayResponse struct{}
 
-func (c *Client) FailPlay(ctx context.Context, req *FailedPlayRequest) (*FailedPlayResponse, error) {
+func (c *Client) FailPlay(ctx context.Context, req *CancelPlayRequest) (*CancelPlayResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &FailedPlayResponse{}
-	if _, err := c.post("/plays/fail", body, out); err != nil {
+	out := &CancelPlayResponse{}
+	if _, err := c.post("/plays/cancel", body, out); err != nil {
 		return nil, err
 	}
 	return out, nil

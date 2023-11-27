@@ -45,33 +45,33 @@ func TestStartPlayRequestValidation(t *testing.T) {
 	}
 }
 
-func TestCompletePlayRequestValidation(t *testing.T) {
+func TestCheckPlayRequestValidation(t *testing.T) {
 	type testCase struct {
-		request CompletePlayRequest
+		request CheckPlayRequest
 		passes  bool
 	}
 
 	cases := []testCase{
 		{
-			request: CompletePlayRequest{
+			request: CheckPlayRequest{
 				ID: uuid.NewString(),
 			},
 			passes: true,
 		},
 		{
-			request: CompletePlayRequest{
+			request: CheckPlayRequest{
 				ID: "bongo",
 			},
 			passes: false,
 		},
 		{
-			request: CompletePlayRequest{},
+			request: CheckPlayRequest{},
 			passes:  false,
 		},
 	}
 
 	for _, c := range cases {
-		t.Run(fmt.Sprintf("complete_play_validation_%s_%t", c.request.ID, c.passes), func(t *testing.T) {
+		t.Run(fmt.Sprintf("check_play_validation_%s_%t", c.request.ID, c.passes), func(t *testing.T) {
 			err := c.request.Validate()
 			if c.passes {
 				assert.Nil(t, err)
@@ -82,33 +82,33 @@ func TestCompletePlayRequestValidation(t *testing.T) {
 	}
 }
 
-func TestFailedPlayRequestValidation(t *testing.T) {
+func TestCancelPlayRequestValidation(t *testing.T) {
 	type testCase struct {
-		request FailedPlayRequest
+		request CancelPlayRequest
 		passes  bool
 	}
 
 	cases := []testCase{
 		{
-			request: FailedPlayRequest{
+			request: CancelPlayRequest{
 				ID: uuid.NewString(),
 			},
 			passes: true,
 		},
 		{
-			request: FailedPlayRequest{
+			request: CancelPlayRequest{
 				ID: "bongo",
 			},
 			passes: false,
 		},
 		{
-			request: FailedPlayRequest{},
+			request: CancelPlayRequest{},
 			passes:  false,
 		},
 	}
 
 	for _, c := range cases {
-		t.Run(fmt.Sprintf("failed_play_validation_%s_%t", c.request.ID, c.passes), func(t *testing.T) {
+		t.Run(fmt.Sprintf("cancel_play_validation_%s_%t", c.request.ID, c.passes), func(t *testing.T) {
 			err := c.request.Validate()
 			if c.passes {
 				assert.Nil(t, err)
