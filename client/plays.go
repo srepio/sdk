@@ -46,7 +46,9 @@ func (r CheckPlayRequest) Validate() error {
 	)
 }
 
-type CheckPlayResponse struct{}
+type CheckPlayResponse struct {
+	Passed bool `json:"passed"`
+}
 
 func (c *Client) CompletePlay(ctx context.Context, req *CheckPlayRequest) (*CheckPlayResponse, error) {
 	body, err := json.Marshal(req)
