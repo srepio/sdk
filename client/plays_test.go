@@ -171,3 +171,62 @@ func TestGetPlays(t *testing.T) {
 		})
 	}
 }
+
+func TestGetShellRequestValidation(t *testing.T) {
+	type testCase struct {
+		request GetShellRequest
+		passes  bool
+	}
+
+	cases := []testCase{
+		{
+			request: GetShellRequest{},
+			passes:  false,
+		},
+		{
+			request: GetShellRequest{
+				ID: uuid.NewString(),
+			},
+			passes: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(fmt.Sprintf("get_shell_validation_%t", c.passes), func(t *testing.T) {
+			err := c.request.Validate()
+			if c.passes {
+				assert.Nil(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+// func TestGetShell(t *testing.T) {
+// 	cases := []apiTestCase{
+// 		{
+// 			Url:  "/plays/shell",
+// 			Code: http.StatusOK,
+// 			Body: `{
+//                 "play": {
+//                     "id": "6aac65e9-17d2-4a34-8503-490138aa3ed5"
+//                 }
+//             }`,
+// 		},
+// 	}
+
+// 	for _, tc := range cases {
+// 		t.Run(fmt.Sprintf("get_shell_%v", tc), func(t *testing.T) {
+// 			s, c := tc.Prepare(t)
+// 			defer s.Close()
+
+// 			_, err := c.GetPlays(context.Background(), &GetPlaysRequest{})
+// 			if tc.Errors {
+// 				assert.Error(t, err)
+// 			} else {
+// 				assert.Nil(t, err)
+// 			}
+// 		})
+// 	}
+// }

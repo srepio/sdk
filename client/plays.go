@@ -105,3 +105,21 @@ func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysR
 	}
 	return out, nil
 }
+
+type GetShellRequest struct {
+	ID string `json:"id"`
+}
+
+func (r GetShellRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
+	)
+}
+
+// func (c *Client) GetShell(ctx context.Context, req *GetPlaysRequest) (*GetPlaysResponse, error) {
+// 	out := &GetPlaysResponse{}
+// 	if _, err := c.get("/plays/shell", nil, out); err != nil {
+// 		return nil, err
+// 	}
+// 	return out, nil
+// }
