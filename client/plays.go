@@ -123,3 +123,21 @@ func (r GetShellRequest) Validate() error {
 // 	}
 // 	return out, nil
 // }
+
+type GetActivePlayRequest struct{}
+
+func (r GetActivePlayRequest) Validate() error {
+	return validation.ValidateStruct(&r)
+}
+
+type GetActivePlayResponse struct {
+	Play *types.Play `json:"play"`
+}
+
+func (c *Client) GetActivePlay(ctx context.Context, req *GetActivePlayRequest) (*GetActivePlayResponse, error) {
+	out := &GetActivePlayResponse{}
+	if _, err := c.get("/plays/active", nil, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
