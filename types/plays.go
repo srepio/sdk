@@ -14,7 +14,6 @@ type Play struct {
 	ID         string     `json:"id"`
 	UserID     string     `json:"user_id"`
 	Scenario   string     `json:"scenario"`
-	Driver     string     `json:"driver"`
 	Status     PlayStatus `json:"status"`
 	CreatedAt  int64      `json:"created_at"`
 	FinishedAt *int64     `json:"finished_at,omitempty"`
