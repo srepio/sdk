@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -137,6 +138,28 @@ type GetActivePlayResponse struct {
 func (c *Client) GetActivePlay(ctx context.Context, req *GetActivePlayRequest) (*GetActivePlayResponse, error) {
 	out := &GetActivePlayResponse{}
 	if _, err := c.get("/plays/active", nil, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+type FindPlayRequest struct {
+	ID string `json:"id"`
+}
+
+func (r FindPlayRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
+	)
+}
+
+type FindPlayResponse struct {
+	Play *types.Play `json:"play"`
+}
+
+func (c *Client) FindPlay(ctx context.Context, req *FindPlayRequest) (*FindPlayResponse, error) {
+	out := &FindPlayResponse{}
+	if _, err := c.get(fmt.Sprintf("/plays/%s", req.ID), nil, out); err != nil {
 		return nil, err
 	}
 	return out, nil

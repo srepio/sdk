@@ -203,6 +203,37 @@ func TestGetShellRequestValidation(t *testing.T) {
 	}
 }
 
+func TestFindPlayRequestValidation(t *testing.T) {
+	type testCase struct {
+		request FindPlayRequest
+		passes  bool
+	}
+
+	cases := []testCase{
+		{
+			request: FindPlayRequest{},
+			passes:  false,
+		},
+		{
+			request: FindPlayRequest{
+				ID: uuid.NewString(),
+			},
+			passes: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(fmt.Sprintf("find_play_validation_%t", c.passes), func(t *testing.T) {
+			err := c.request.Validate()
+			if c.passes {
+				assert.Nil(t, err)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
 // func TestGetShell(t *testing.T) {
 // 	cases := []apiTestCase{
 // 		{
