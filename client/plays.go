@@ -108,7 +108,9 @@ func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysR
 }
 
 type GetShellRequest struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
+	Rows int    `json:"rows"`
+	Cols int    `json:"cols"`
 }
 
 func (r GetShellRequest) Validate() error {
