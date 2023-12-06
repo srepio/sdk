@@ -1,6 +1,6 @@
 module github.com/srepio/sdk
 
-go 1.21.0
+go 1.21.5
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.23.2
