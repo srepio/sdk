@@ -3,7 +3,7 @@ module github.com/srepio/sdk
 go 1.21.0
 
 require (
-	github.com/brianvoe/gofakeit/v6 v6.23.2
+	github.com/brianvoe/gofakeit/v6 v6.26.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/google/uuid v1.3.1
 	github.com/stretchr/testify v1.8.4
