@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -119,13 +120,12 @@ func (r GetShellRequest) Validate() error {
 	)
 }
 
-// func (c *Client) GetShell(ctx context.Context, req *GetPlaysRequest) (*GetPlaysResponse, error) {
-// 	out := &GetPlaysResponse{}
-// 	if _, err := c.get("/plays/shell", nil, out); err != nil {
-// 		return nil, err
-// 	}
-// 	return out, nil
-// }
+func (c *Client) GetShell(ctx context.Context, req *GetShellRequest) error {
+	// if _, err := c.get("/plays/shell", nil, out); err != nil {
+	// 	return err
+	// }
+	return errors.New("not implemented yet")
+}
 
 type GetActivePlayRequest struct{}
 
