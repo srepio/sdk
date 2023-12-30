@@ -81,3 +81,58 @@ func (c *Client) Me(ctx context.Context) (*MeResponse, error) {
 	}
 	return me, nil
 }
+
+type GetApiTokensRequest struct{}
+
+type GetApiTokensResponse struct {
+	Tokens []types.ApiToken
+}
+
+func (c *Client) GetApiTokens(ctx context.Context, req *GetApiTokensRequest) (*GetApiTokensResponse, error) {
+	resp := &GetApiTokensResponse{}
+	if _, err := c.get("/auth/tokens", map[string]string{}, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+type CreateApiTokenRequest struct {
+	Name string `json:"name"`
+}
+
+type CreateApiTokenResponse struct {
+	Name  string `json:"name"`
+	Token string `json:"token"`
+}
+
+func (c *Client) CreateApiToken(ctx context.Context, req *CreateApiTokenRequest) (*CreateApiTokenResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &CreateApiTokenResponse{}
+	if _, err := c.post("/auth/tokens", body, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+type DeleteApiTokenRequest struct {
+	Name string `json:"name"`
+}
+
+type DeleteApiTokenResponse struct{}
+
+func (c *Client) DeleteApiToken(ctx context.Context, req *DeleteApiTokenRequest) (*DeleteApiTokenResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &DeleteApiTokenResponse{}
+	if _, err := c.delete("/auth/tokens", body, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
