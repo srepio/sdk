@@ -128,6 +128,12 @@ type DeleteApiTokenRequest struct {
 	Name string `json:"name"`
 }
 
+func (r DeleteApiTokenRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required),
+	)
+}
+
 type DeleteApiTokenResponse struct{}
 
 func (c *Client) DeleteApiToken(ctx context.Context, req *DeleteApiTokenRequest) (*DeleteApiTokenResponse, error) {
