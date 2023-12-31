@@ -100,6 +100,12 @@ type CreateApiTokenRequest struct {
 	Name string `json:"name"`
 }
 
+func (r CreateApiTokenRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required),
+	)
+}
+
 type CreateApiTokenResponse struct {
 	Name  string `json:"name"`
 	Token string `json:"token"`
