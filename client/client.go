@@ -97,6 +97,7 @@ func (c *Client) request(req *http.Request, data any) (*http.Response, error) {
 	if c.Options.Token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
 	}
+	req.Header.Set("User-Agent", "SrepGoSDK/0.1.51")
 	resp, err := c.hc.Do(req)
 	if err != nil {
 		return resp, err
