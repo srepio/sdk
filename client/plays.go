@@ -77,7 +77,7 @@ func (r CancelPlayRequest) Validate() error {
 
 type CancelPlayResponse struct{}
 
-func (c *Client) FailPlay(ctx context.Context, req *CancelPlayRequest) (*CancelPlayResponse, error) {
+func (c *Client) CancelPlay(ctx context.Context, req *CancelPlayRequest) (*CancelPlayResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
