@@ -52,7 +52,7 @@ type CheckPlayResponse struct {
 	Passed bool `json:"passed"`
 }
 
-func (c *Client) CompletePlay(ctx context.Context, req *CheckPlayRequest) (*CheckPlayResponse, error) {
+func (c *Client) CheckPlay(ctx context.Context, req *CheckPlayRequest) (*CheckPlayResponse, error) {
 	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
