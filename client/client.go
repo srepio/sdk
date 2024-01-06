@@ -91,6 +91,9 @@ func (c *Client) delete(path string, body []byte, data any) (*http.Response, err
 }
 
 func (c *Client) request(req *http.Request, data any) (*http.Response, error) {
+	if req.Header == nil {
+		req.Header = http.Header{}
+	}
 	if c.Options.Token != "" {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
 	}
