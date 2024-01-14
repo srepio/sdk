@@ -4,14 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
+	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gorilla/websocket"
 	"github.com/srepio/sdk/types"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type StartPlayRequest struct {
@@ -123,7 +125,7 @@ func (r GetShellRequest) Validate() error {
 	)
 }
 
-func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Reader, stdout io.Writer) error {
+func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.File, stdout *os.File) error {
 	var scheme string
 	if c.Options.Scheme == "https" {
 		scheme = "wss"
@@ -139,14 +141,41 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Re
 	headers := make(http.Header)
 	headers.Add("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
 
-	ws, resp, err := websocket.DefaultDialer.Dial(url.String(), headers)
+	wso, resp, err := websocket.DefaultDialer.Dial(url.String(), headers)
 	if err != nil {
 		if resp.StatusCode == http.StatusTooEarly {
 			return ErrTooEarly
 		}
 		return fmt.Errorf("%v: %d", err, resp.StatusCode)
 	}
-	defer ws.Close()
+	defer wso.Close()
+	sock := newWs(wso)
+
+	go func() {
+		var oldRows int
+		var oldCols int
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				cols, rows, err := terminal.GetSize(int(stdout.Fd()))
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				if oldRows != rows || oldCols != cols {
+					msg := &types.TerminalMessage{
+						Type:    types.Resize,
+						Content: fmt.Sprintf("%d,%d", rows, cols),
+					}
+					sock.Write(msg)
+				}
+				time.Sleep(time.Second * 1)
+			}
+		}
+	}()
 
 	done := make(chan struct{})
 
@@ -157,7 +186,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Re
 			case <-ctx.Done():
 				return
 			default:
-				_, message, err := ws.ReadMessage()
+				msg, err := sock.Read()
 				if err != nil {
 					if websocket.IsUnexpectedCloseError(err) {
 						return
@@ -166,14 +195,8 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Re
 					return
 				}
 
-				msg := &types.TerminalMessage{}
-				if err := json.Unmarshal(message, msg); err != nil {
-					fmt.Println(err)
-					return
-				}
-
 				if msg.Type == types.Ping {
-					if err := ws.WriteJSON(types.TerminalMessage{Type: types.Pong}); err != nil {
+					if err := sock.Write(&types.TerminalMessage{Type: types.Pong}); err != nil {
 						fmt.Println(err)
 						return
 					}
@@ -205,7 +228,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Re
 					Type:    types.Input,
 					Content: string(data),
 				}
-				if err := ws.WriteJSON(msg); err != nil {
+				if err := sock.Write(msg); err != nil {
 					fmt.Println(err)
 					return
 				}
