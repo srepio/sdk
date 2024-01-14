@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gorilla/websocket"
@@ -140,30 +141,41 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 	headers := make(http.Header)
 	headers.Add("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
 
-	ws, resp, err := websocket.DefaultDialer.Dial(url.String(), headers)
+	wso, resp, err := websocket.DefaultDialer.Dial(url.String(), headers)
 	if err != nil {
 		if resp.StatusCode == http.StatusTooEarly {
 			return ErrTooEarly
 		}
 		return fmt.Errorf("%v: %d", err, resp.StatusCode)
 	}
-	defer ws.Close()
+	defer wso.Close()
+	sock := newWs(wso)
 
-	resize := func(term *os.File, ws *websocket.Conn) error {
-		cols, rows, err := terminal.GetSize(int(term.Fd()))
-		if err != nil {
-			return err
-		}
-		msg := &types.TerminalMessage{
-			Type:    types.Resize,
-			Content: fmt.Sprintf("%d,%d", rows, cols),
-		}
-		return ws.WriteJSON(msg)
-	}
+	go func() {
+		var oldRows int
+		var oldCols int
 
-	if err := resize(stdout, ws); err != nil {
-		return err
-	}
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				cols, rows, err := terminal.GetSize(int(stdout.Fd()))
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				if oldRows != rows || oldCols != cols {
+					msg := &types.TerminalMessage{
+						Type:    types.Resize,
+						Content: fmt.Sprintf("%d,%d", rows, cols),
+					}
+					sock.Write(msg)
+				}
+				time.Sleep(time.Second * 1)
+			}
+		}
+	}()
 
 	done := make(chan struct{})
 
@@ -174,7 +186,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 			case <-ctx.Done():
 				return
 			default:
-				_, message, err := ws.ReadMessage()
+				msg, err := sock.Read()
 				if err != nil {
 					if websocket.IsUnexpectedCloseError(err) {
 						return
@@ -183,14 +195,8 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 					return
 				}
 
-				msg := &types.TerminalMessage{}
-				if err := json.Unmarshal(message, msg); err != nil {
-					fmt.Println(err)
-					return
-				}
-
 				if msg.Type == types.Ping {
-					if err := ws.WriteJSON(types.TerminalMessage{Type: types.Pong}); err != nil {
+					if err := sock.Write(&types.TerminalMessage{Type: types.Pong}); err != nil {
 						fmt.Println(err)
 						return
 					}
@@ -222,7 +228,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 					Type:    types.Input,
 					Content: string(data),
 				}
-				if err := ws.WriteJSON(msg); err != nil {
+				if err := sock.Write(msg); err != nil {
 					fmt.Println(err)
 					return
 				}
