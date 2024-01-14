@@ -3,11 +3,14 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/gorilla/websocket"
 	"github.com/srepio/sdk/types"
 )
 
@@ -120,11 +123,98 @@ func (r GetShellRequest) Validate() error {
 	)
 }
 
-func (c *Client) GetShell(ctx context.Context, req *GetShellRequest) error {
-	// if _, err := c.get("/plays/shell", nil, out); err != nil {
-	// 	return err
-	// }
-	return errors.New("not implemented yet")
+func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Reader, stdout io.Writer) error {
+	var scheme string
+	if c.Options.Scheme == "https" {
+		scheme = "wss"
+	} else {
+		scheme = "ws"
+	}
+
+	url := url.URL{
+		Scheme: scheme,
+		Host:   c.Options.Url,
+		Path:   fmt.Sprintf("/plays/%s/shell", req.ID),
+	}
+	headers := make(http.Header)
+	headers.Add("Authorization", fmt.Sprintf("Bearer %s", c.Options.Token))
+
+	ws, resp, err := websocket.DefaultDialer.Dial(url.String(), headers)
+	if err != nil {
+		if resp.StatusCode == http.StatusTooEarly {
+			return ErrTooEarly
+		}
+		return fmt.Errorf("%v: %d", err, resp.StatusCode)
+	}
+	defer ws.Close()
+
+	done := make(chan struct{})
+
+	go func() {
+		defer close(done)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				_, message, err := ws.ReadMessage()
+				if err != nil {
+					if websocket.IsUnexpectedCloseError(err) {
+						return
+					}
+					fmt.Println(err)
+					return
+				}
+
+				msg := &types.TerminalMessage{}
+				if err := json.Unmarshal(message, msg); err != nil {
+					fmt.Println(err)
+					return
+				}
+
+				if msg.Type == types.Ping {
+					if err := ws.WriteJSON(types.TerminalMessage{Type: types.Pong}); err != nil {
+						fmt.Println(err)
+						return
+					}
+				} else {
+					stdout.Write([]byte(msg.Content))
+				}
+			}
+		}
+	}()
+
+	go func() {
+		buffer := make([]byte, 1024)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				n, err := stdin.Read(buffer)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+				if n == 0 {
+					continue
+				}
+				data := make([]byte, n)
+				copy(data, buffer)
+				msg := &types.TerminalMessage{
+					Type:    types.Input,
+					Content: string(data),
+				}
+				if err := ws.WriteJSON(msg); err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
+		}
+	}()
+
+	<-done
+	return nil
 }
 
 type GetActivePlayRequest struct{}
