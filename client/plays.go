@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/gorilla/websocket"
 	"github.com/srepio/sdk/types"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type StartPlayRequest struct {
@@ -123,7 +124,7 @@ func (r GetShellRequest) Validate() error {
 	)
 }
 
-func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Reader, stdout io.Writer) error {
+func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.File, stdout *os.File) error {
 	var scheme string
 	if c.Options.Scheme == "https" {
 		scheme = "wss"
@@ -147,6 +148,22 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin io.Re
 		return fmt.Errorf("%v: %d", err, resp.StatusCode)
 	}
 	defer ws.Close()
+
+	resize := func(term *os.File, ws *websocket.Conn) error {
+		cols, rows, err := terminal.GetSize(int(term.Fd()))
+		if err != nil {
+			return err
+		}
+		msg := &types.TerminalMessage{
+			Type:    types.Resize,
+			Content: fmt.Sprintf("%d,%d", rows, cols),
+		}
+		return ws.WriteJSON(msg)
+	}
+
+	if err := resize(stdout, ws); err != nil {
+		return err
+	}
 
 	done := make(chan struct{})
 
