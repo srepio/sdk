@@ -148,3 +148,30 @@ func (c *Client) DeleteApiToken(ctx context.Context, req *DeleteApiTokenRequest)
 	}
 	return resp, nil
 }
+
+type ConfirmPasswordRequest struct {
+	Password string `json:"password"`
+}
+
+func (r ConfirmPasswordRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Password, validation.Required),
+	)
+}
+
+type ConfirmPasswordResponse struct {
+	Confirmed bool `json:"confirmed"`
+}
+
+func (c *Client) ConfirmPassword(ctx context.Context, req *ConfirmPasswordRequest) (*ConfirmPasswordResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &ConfirmPasswordResponse{}
+	if _, err := c.post("/auth/password/confirm", body, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
