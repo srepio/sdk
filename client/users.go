@@ -191,7 +191,7 @@ func (r UpdatePasswordRequest) Validate() error {
 }
 
 type UpdatePasswordResponse struct {
-	Update bool `json:"updated"`
+	Updated bool `json:"updated"`
 }
 
 func (c *Client) UpdatePassword(ctx context.Context, req *UpdatePasswordRequest) (*UpdatePasswordResponse, error) {
