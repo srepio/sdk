@@ -175,3 +175,34 @@ func (c *Client) ConfirmPassword(ctx context.Context, req *ConfirmPasswordReques
 	}
 	return resp, nil
 }
+
+type UpdatePasswordRequest struct {
+	CurrentPassword         string `json:"current_password"`
+	NewPassword             string `json:"new_password"`
+	NewPasswordConfirmation string `json:"new_password_confirmation"`
+}
+
+func (r UpdatePasswordRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.CurrentPassword, validation.Required),
+		validation.Field(&r.NewPassword, validation.Required),
+		validation.Field(&r.NewPasswordConfirmation, validation.Required),
+	)
+}
+
+type UpdatePasswordResponse struct {
+	Updated bool `json:"updated"`
+}
+
+func (c *Client) UpdatePassword(ctx context.Context, req *UpdatePasswordRequest) (*UpdatePasswordResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &UpdatePasswordResponse{}
+	if _, err := c.post("/auth/password/update", body, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
