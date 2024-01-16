@@ -53,9 +53,10 @@ func (r LoginRequest) Validate() error {
 }
 
 type LoginResponse struct {
-	User        *types.User `json:"user"`
-	Token       string      `json:"token"`
-	MFARequired bool        `json:"mfa_required"`
+	User             *types.User `json:"user"`
+	Token            string      `json:"token"`
+	MFARequired      bool        `json:"mfa_required"`
+	AuthenticationID string      `json:"authentication_id"`
 }
 
 func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
@@ -66,6 +67,31 @@ func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, 
 
 	out := &LoginResponse{}
 	if _, err := c.post("/auth/login", body, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+type VerifyMFARequest struct {
+	AuthenticationID string `json:"authentication_id"`
+	Code             string `json:"code"`
+}
+
+func (r VerifyMFARequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.AuthenticationID, validation.Required),
+		validation.Field(&r.Code, validation.Required),
+	)
+}
+
+func (c *Client) VerifyMFA(ctx context.Context, req *VerifyMFARequest) (*LoginResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	out := &LoginResponse{}
+	if _, err := c.post("/auth/mfa/verify", body, out); err != nil {
 		return nil, err
 	}
 	return out, nil
