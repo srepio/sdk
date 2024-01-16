@@ -53,8 +53,8 @@ func (r LoginRequest) Validate() error {
 }
 
 type LoginResponse struct {
-	User             *types.User `json:"user"`
-	Token            string      `json:"token"`
+	User             *types.User `json:"user,omitempty"`
+	Token            string      `json:"token,omitempty"`
 	MFARequired      bool        `json:"mfa_required,omitempty"`
 	AuthenticationID string      `json:"authentication_id,omitempty"`
 }
