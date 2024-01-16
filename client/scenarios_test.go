@@ -22,7 +22,9 @@ func TestScenarioFind(t *testing.T) {
 		Url: "api.srep.io",
 	})
 
-	_, err := client.FindScenario(context.Background(), "mango")
+	_, err := client.FindScenario(context.Background(), &FindScenarioRequest{
+		Scenario: "mango",
+	})
 
 	if err != nil {
 		t.Error(err)
