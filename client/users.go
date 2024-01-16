@@ -53,8 +53,9 @@ func (r LoginRequest) Validate() error {
 }
 
 type LoginResponse struct {
-	User  *types.User `json:"user"`
-	Token string      `json:"token"`
+	User        *types.User `json:"user"`
+	Token       string      `json:"token"`
+	MFARequired bool        `json:"mfa_required"`
 }
 
 func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
