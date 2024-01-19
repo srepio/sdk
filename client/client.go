@@ -124,8 +124,10 @@ func do[T any](ctx context.Context, c *http.Client, req *http.Request) (*T, erro
 	}
 
 	var out T
-	if err := json.Unmarshal(bout, &out); err != nil {
-		return nil, err
+	if len(bout) > 0 {
+		if err := json.Unmarshal(bout, &out); err != nil {
+			return nil, err
+		}
 	}
 
 	return &out, err

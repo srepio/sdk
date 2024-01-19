@@ -240,3 +240,19 @@ func (c *Client) ConfigureMFA(ctx context.Context, req *ConfigureMFARequest) (*C
 
 	return do[ConfigureMFAResponse](ctx, c.hc, hreq)
 }
+
+type RemoveMFARequest struct{}
+
+func (r RemoveMFARequest) Validate() error {
+	return nil
+}
+
+type RemoveMFAResponse struct{}
+
+func (c *Client) RemoveMFA(ctx context.Context, req *RemoveMFARequest) (*RemoveMFAResponse, error) {
+	hreq, err := c.buildRequest(http.MethodDelete, "/auth/mfa", req, nil)
+	if err != nil {
+		return nil, err
+	}
+	return do[RemoveMFAResponse](ctx, c.hc, hreq)
+}
