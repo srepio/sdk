@@ -3,27 +3,41 @@ package client
 import (
 	"context"
 	"fmt"
+	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/srepio/sdk/types"
 )
 
-type GetscenariosResponse struct {
+type GetScenariosRequest struct{}
+
+func (r GetScenariosRequest) Validate() error {
+	return nil
+}
+
+type GetScenariosResponse struct {
 	Scenarios *types.Metadata `json:"scenarios"`
 }
 
 // Get all scenarios
-func (c *Client) Getscenarios(ctx context.Context) (*GetscenariosResponse, error) {
-	md := &GetscenariosResponse{}
-	if _, err := c.get("/scenarios", map[string]string{}, md); err != nil {
+func (c *Client) GetScenarios(ctx context.Context, req *GetScenariosRequest) (*GetScenariosResponse, error) {
+	hreq, err := c.buildRequest(http.MethodGet, "/scenarios", req, nil)
+	if err != nil {
 		return nil, err
 	}
 
-	return md, nil
+	return do[GetScenariosResponse](ctx, c.hc, hreq)
 }
 
 type FindScenarioRequest struct {
 	Scenario string
 	Page     int
+}
+
+func (r FindScenarioRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Scenario, validation.Required),
+	)
 }
 
 type FindScenarioResponse struct {
@@ -36,9 +50,10 @@ func (c *Client) FindScenario(ctx context.Context, req *FindScenarioRequest) (*F
 	if req.Page == 0 {
 		req.Page = 1
 	}
-	s := &FindScenarioResponse{}
-	if _, err := c.get(fmt.Sprintf("/scenarios/%s?page=%d", req.Scenario, req.Page), map[string]string{}, s); err != nil {
+	hreq, err := c.buildRequest(http.MethodGet, fmt.Sprintf("/scenarios/%s", req.Scenario), req, map[string]string{"page": fmt.Sprintf("%d", req.Page)})
+	if err != nil {
 		return nil, err
 	}
-	return s, nil
+
+	return do[FindScenarioResponse](ctx, c.hc, hreq)
 }

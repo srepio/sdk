@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -31,16 +30,12 @@ type StartPlayResponse struct {
 }
 
 func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPlayResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/plays", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &StartPlayResponse{}
-	if _, err := c.post("/plays", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[StartPlayResponse](ctx, c.hc, hreq)
 }
 
 type CheckPlayRequest struct {
@@ -58,16 +53,12 @@ type CheckPlayResponse struct {
 }
 
 func (c *Client) CheckPlay(ctx context.Context, req *CheckPlayRequest) (*CheckPlayResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/plays/check", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &CheckPlayResponse{}
-	if _, err := c.post("/plays/check", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[CheckPlayResponse](ctx, c.hc, hreq)
 }
 
 type CancelPlayRequest struct {
@@ -83,16 +74,12 @@ func (r CancelPlayRequest) Validate() error {
 type CancelPlayResponse struct{}
 
 func (c *Client) CancelPlay(ctx context.Context, req *CancelPlayRequest) (*CancelPlayResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/plays/cancel", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &CancelPlayResponse{}
-	if _, err := c.post("/plays/cancel", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[CancelPlayResponse](ctx, c.hc, hreq)
 }
 
 type GetPlaysRequest struct{}
@@ -106,11 +93,12 @@ type GetPlaysResponse struct {
 }
 
 func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysResponse, error) {
-	out := &GetPlaysResponse{}
-	if _, err := c.get("/plays", nil, out); err != nil {
+	hreq, err := c.buildRequest(http.MethodGet, "/plays", req, nil)
+	if err != nil {
 		return nil, err
 	}
-	return out, nil
+
+	return do[GetPlaysResponse](ctx, c.hc, hreq)
 }
 
 type GetShellRequest struct {
@@ -251,11 +239,12 @@ type GetActivePlayResponse struct {
 }
 
 func (c *Client) GetActivePlay(ctx context.Context, req *GetActivePlayRequest) (*GetActivePlayResponse, error) {
-	out := &GetActivePlayResponse{}
-	if _, err := c.get("/plays/active", nil, out); err != nil {
+	hreq, err := c.buildRequest(http.MethodGet, "/plays/active", req, nil)
+	if err != nil {
 		return nil, err
 	}
-	return out, nil
+
+	return do[GetActivePlayResponse](ctx, c.hc, hreq)
 }
 
 type FindPlayRequest struct {
@@ -273,9 +262,10 @@ type FindPlayResponse struct {
 }
 
 func (c *Client) FindPlay(ctx context.Context, req *FindPlayRequest) (*FindPlayResponse, error) {
-	out := &FindPlayResponse{}
-	if _, err := c.get(fmt.Sprintf("/plays/%s", req.ID), nil, out); err != nil {
+	hreq, err := c.buildRequest(http.MethodPost, fmt.Sprintf("/plays/%s", req.ID), req, nil)
+	if err != nil {
 		return nil, err
 	}
-	return out, nil
+
+	return do[FindPlayResponse](ctx, c.hc, hreq)
 }

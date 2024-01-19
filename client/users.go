@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"encoding/json"
+	"net/http"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -28,16 +28,12 @@ type CreateUserResponse struct {
 }
 
 func (c *Client) CreateUser(ctx context.Context, req *CreateUserRequest) (*CreateUserResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &CreateUserResponse{}
-	if _, err := c.post("/auth", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[CreateUserResponse](ctx, c.hc, hreq)
 }
 
 type LoginRequest struct {
@@ -60,16 +56,12 @@ type LoginResponse struct {
 }
 
 func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/login", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &LoginResponse{}
-	if _, err := c.post("/auth/login", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[LoginResponse](ctx, c.hc, hreq)
 }
 
 type VerifyMFARequest struct {
@@ -85,42 +77,50 @@ func (r VerifyMFARequest) Validate() error {
 }
 
 func (c *Client) VerifyMFA(ctx context.Context, req *VerifyMFARequest) (*LoginResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/mfa/verify", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	out := &LoginResponse{}
-	if _, err := c.post("/auth/mfa/verify", body, out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return do[LoginResponse](ctx, c.hc, hreq)
+}
+
+type MeRequest struct{}
+
+func (r MeRequest) Validate() error {
+	return nil
 }
 
 type MeResponse struct {
 	User *types.User `json:"user"`
 }
 
-func (c *Client) Me(ctx context.Context) (*MeResponse, error) {
-	me := &MeResponse{}
-	if _, err := c.get("/auth/me", map[string]string{}, me); err != nil {
+func (c *Client) Me(ctx context.Context, req *MeRequest) (*MeResponse, error) {
+	hreq, err := c.buildRequest(http.MethodGet, "/auth/me", req, nil)
+	if err != nil {
 		return nil, err
 	}
-	return me, nil
+
+	return do[MeResponse](ctx, c.hc, hreq)
 }
 
 type GetApiTokensRequest struct{}
+
+func (r GetApiTokensRequest) Validate() error {
+	return nil
+}
 
 type GetApiTokensResponse struct {
 	Tokens []types.ApiToken
 }
 
 func (c *Client) GetApiTokens(ctx context.Context, req *GetApiTokensRequest) (*GetApiTokensResponse, error) {
-	resp := &GetApiTokensResponse{}
-	if _, err := c.get("/auth/tokens", map[string]string{}, resp); err != nil {
+	hreq, err := c.buildRequest(http.MethodGet, "/auth/tokens", req, nil)
+	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+
+	return do[GetApiTokensResponse](ctx, c.hc, hreq)
 }
 
 type CreateApiTokenRequest struct {
@@ -139,16 +139,12 @@ type CreateApiTokenResponse struct {
 }
 
 func (c *Client) CreateApiToken(ctx context.Context, req *CreateApiTokenRequest) (*CreateApiTokenResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/tokens", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &CreateApiTokenResponse{}
-	if _, err := c.post("/auth/tokens", body, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return do[CreateApiTokenResponse](ctx, c.hc, hreq)
 }
 
 type DeleteApiTokenRequest struct {
@@ -164,16 +160,12 @@ func (r DeleteApiTokenRequest) Validate() error {
 type DeleteApiTokenResponse struct{}
 
 func (c *Client) DeleteApiToken(ctx context.Context, req *DeleteApiTokenRequest) (*DeleteApiTokenResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodDelete, "/auth/tokens", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &DeleteApiTokenResponse{}
-	if _, err := c.delete("/auth/tokens", body, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return do[DeleteApiTokenResponse](ctx, c.hc, hreq)
 }
 
 type ConfirmPasswordRequest struct {
@@ -191,16 +183,12 @@ type ConfirmPasswordResponse struct {
 }
 
 func (c *Client) ConfirmPassword(ctx context.Context, req *ConfirmPasswordRequest) (*ConfirmPasswordResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/password/confirm", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &ConfirmPasswordResponse{}
-	if _, err := c.post("/auth/password/confirm", body, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return do[ConfirmPasswordResponse](ctx, c.hc, hreq)
 }
 
 type UpdatePasswordRequest struct {
@@ -222,16 +210,12 @@ type UpdatePasswordResponse struct {
 }
 
 func (c *Client) UpdatePassword(ctx context.Context, req *UpdatePasswordRequest) (*UpdatePasswordResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/password/update", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &UpdatePasswordResponse{}
-	if _, err := c.post("/auth/password/update", body, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return do[UpdatePasswordResponse](ctx, c.hc, hreq)
 }
 
 type ConfigureMFARequest struct {
@@ -249,14 +233,10 @@ type ConfigureMFAResponse struct {
 }
 
 func (c *Client) ConfigureMFA(ctx context.Context, req *ConfigureMFARequest) (*ConfigureMFAResponse, error) {
-	body, err := json.Marshal(req)
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/mfa/configure", req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := &ConfigureMFAResponse{}
-	if _, err := c.post("/auth/mfa/configure", body, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return do[ConfigureMFAResponse](ctx, c.hc, hreq)
 }

@@ -10,7 +10,7 @@ func TestGetScenarios(t *testing.T) {
 		Url: "api.srep.io",
 	})
 
-	_, err := client.Getscenarios(context.Background())
+	_, err := client.GetScenarios(context.Background(), &GetScenariosRequest{})
 
 	if err != nil {
 		t.Error(err)
