@@ -233,3 +233,30 @@ func (c *Client) UpdatePassword(ctx context.Context, req *UpdatePasswordRequest)
 	}
 	return resp, nil
 }
+
+type ConfigureMFARequest struct {
+	Provider types.MFAType `json:"provider"`
+}
+
+func (r ConfigureMFARequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Provider, validation.Required, validation.In(types.TOTP)),
+	)
+}
+
+type ConfigureMFAResponse struct {
+	Data *types.MFAData `json:"mfa_data"`
+}
+
+func (c *Client) ConfigureMFA(ctx context.Context, req *ConfigureMFARequest) (*ConfigureMFAResponse, error) {
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &ConfigureMFAResponse{}
+	if _, err := c.post("/auth/mfa/configure", body, resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
