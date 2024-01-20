@@ -113,7 +113,7 @@ func (r GetApiTokensRequest) Validate() error {
 }
 
 type GetApiTokensResponse struct {
-	Tokens []types.ApiToken
+	Tokens []types.ApiToken `json:"tokens"`
 }
 
 func (c *Client) GetApiTokens(ctx context.Context, req *GetApiTokensRequest) (*GetApiTokensResponse, error) {
