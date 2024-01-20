@@ -49,10 +49,11 @@ func (r LoginRequest) Validate() error {
 }
 
 type LoginResponse struct {
-	User             *types.User `json:"user,omitempty"`
-	Token            string      `json:"token,omitempty"`
-	MFARequired      bool        `json:"mfa_required,omitempty"`
-	AuthenticationID string      `json:"authentication_id,omitempty"`
+	User             *types.User        `json:"user,omitempty"`
+	Token            string             `json:"token,omitempty"`
+	Details          *types.UserDetails `json:"details,omitempty"`
+	MFARequired      bool               `json:"mfa_required,omitempty"`
+	AuthenticationID string             `json:"authentication_id,omitempty"`
 }
 
 func (c *Client) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
@@ -92,7 +93,8 @@ func (r MeRequest) Validate() error {
 }
 
 type MeResponse struct {
-	User *types.User `json:"user"`
+	User    *types.User        `json:"user"`
+	Details *types.UserDetails `json:"details"`
 }
 
 func (c *Client) Me(ctx context.Context, req *MeRequest) (*MeResponse, error) {
