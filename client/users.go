@@ -258,3 +258,19 @@ func (c *Client) RemoveMFA(ctx context.Context, req *RemoveMFARequest) (*RemoveM
 	}
 	return do[RemoveMFAResponse](ctx, c.hc, hreq)
 }
+
+type LogoutRequest struct{}
+
+func (r LogoutRequest) Validate() error {
+	return nil
+}
+
+type LogoutResponse struct{}
+
+func (c *Client) Logout(ctx context.Context, req *LogoutRequest) (*LogoutResponse, error) {
+	hreq, err := c.buildRequest(http.MethodPost, "/auth/logout", req, nil)
+	if err != nil {
+		return nil, err
+	}
+	return do[LogoutResponse](ctx, c.hc, hreq)
+}
