@@ -274,3 +274,24 @@ func (c *Client) Logout(ctx context.Context, req *LogoutRequest) (*LogoutRespons
 	}
 	return do[LogoutResponse](ctx, c.hc, hreq)
 }
+
+type DeleteAccountRequest struct {
+	// Confirm the password to make sure
+	Password string `json:"password"`
+}
+
+func (r DeleteAccountRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Password, validation.Required),
+	)
+}
+
+type DeleteAccountResponse struct{}
+
+func (c *Client) DeleteAccount(ctx context.Context, req *DeleteAccountRequest) (*DeleteAccountResponse, error) {
+	hreq, err := c.buildRequest(http.MethodDelete, "/auth/account", req, nil)
+	if err != nil {
+		return nil, err
+	}
+	return do[DeleteAccountResponse](ctx, c.hc, hreq)
+}

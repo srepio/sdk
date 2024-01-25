@@ -4,3 +4,9 @@ tasks:
   test:
     cmds:
       - gotestsum --format testname {{ .CLI_ARGS }}
+
+  version:
+    dotenv:
+      - .env
+    cmds:
+      - semantic-release --no-ci --dry-run
