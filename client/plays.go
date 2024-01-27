@@ -26,7 +26,7 @@ func (r StartPlayRequest) Validate() error {
 }
 
 type StartPlayResponse struct {
-	ID string `json:"id"`
+	Play *types.Play `json:"play"`
 }
 
 func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPlayResponse, error) {
