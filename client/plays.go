@@ -154,7 +154,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 					return
 				}
 				if oldRows != rows || oldCols != cols {
-					msg := &types.TerminalMessage{
+					msg := &types.SocketEvent{
 						Type:    types.Resize,
 						Content: fmt.Sprintf("%d,%d", rows, cols),
 					}
@@ -184,7 +184,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 				}
 
 				if msg.Type == types.Ping {
-					if err := sock.Write(&types.TerminalMessage{Type: types.Pong}); err != nil {
+					if err := sock.Write(&types.SocketEvent{Type: types.Pong}); err != nil {
 						fmt.Println(err)
 						return
 					}
@@ -212,7 +212,7 @@ func (c *Client) GetShell(ctx context.Context, req *GetShellRequest, stdin *os.F
 				}
 				data := make([]byte, n)
 				copy(data, buffer)
-				msg := &types.TerminalMessage{
+				msg := &types.SocketEvent{
 					Type:    types.Input,
 					Content: string(data),
 				}

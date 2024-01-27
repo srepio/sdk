@@ -11,7 +11,7 @@ const (
 	Resize MessgaeType = "resize"
 )
 
-type TerminalMessage struct {
+type SocketEvent struct {
 	Type    MessgaeType `json:"type"`
 	Content string      `json:"content"`
 }

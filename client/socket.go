@@ -20,19 +20,19 @@ func newWs(conn *websocket.Conn) *ws {
 	}
 }
 
-func (ws *ws) Read() (*types.TerminalMessage, error) {
+func (ws *ws) Read() (*types.SocketEvent, error) {
 	_, raw, err := ws.conn.ReadMessage()
 	if err != nil {
 		return nil, err
 	}
-	msg := &types.TerminalMessage{}
+	msg := &types.SocketEvent{}
 	if err := json.Unmarshal(raw, msg); err != nil {
 		return nil, err
 	}
 	return msg, nil
 }
 
-func (ws *ws) Write(msg *types.TerminalMessage) error {
+func (ws *ws) Write(msg *types.SocketEvent) error {
 	ws.mu.Lock()
 	defer ws.mu.Unlock()
 
