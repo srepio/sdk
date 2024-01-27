@@ -205,17 +205,17 @@ func TestGetShellRequestValidation(t *testing.T) {
 
 func TestFindPlayRequestValidation(t *testing.T) {
 	type testCase struct {
-		request FindPlayRequest
+		request GetPlayRequest
 		passes  bool
 	}
 
 	cases := []testCase{
 		{
-			request: FindPlayRequest{},
+			request: GetPlayRequest{},
 			passes:  false,
 		},
 		{
-			request: FindPlayRequest{
+			request: GetPlayRequest{
 				ID: uuid.NewString(),
 			},
 			passes: true,

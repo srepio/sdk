@@ -247,25 +247,26 @@ func (c *Client) GetActivePlay(ctx context.Context, req *GetActivePlayRequest) (
 	return do[GetActivePlayResponse](ctx, c.hc, hreq)
 }
 
-type FindPlayRequest struct {
+type GetPlayRequest struct {
 	ID string `json:"id"`
 }
 
-func (r FindPlayRequest) Validate() error {
+func (r GetPlayRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.ID, validation.Required, validation.Match(regexp.MustCompile(uuidRegex))),
 	)
 }
 
-type FindPlayResponse struct {
-	Play *types.Play `json:"play"`
+type GetPlayResponse struct {
+	Play    *types.Play `json:"play"`
+	History []string    `json:"history"`
 }
 
-func (c *Client) FindPlay(ctx context.Context, req *FindPlayRequest) (*FindPlayResponse, error) {
+func (c *Client) GetPlay(ctx context.Context, req *GetPlayRequest) (*GetPlayResponse, error) {
 	hreq, err := c.buildRequest(http.MethodPost, fmt.Sprintf("/plays/%s", req.ID), req, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return do[FindPlayResponse](ctx, c.hc, hreq)
+	return do[GetPlayResponse](ctx, c.hc, hreq)
 }
