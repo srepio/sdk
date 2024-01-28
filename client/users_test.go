@@ -60,6 +60,14 @@ func TestCreateUserRequestValidation(t *testing.T) {
 			},
 			passes: false,
 		},
+		{
+			request: CreateUserRequest{
+				Name:     gofakeit.Name(),
+				Email:    gofakeit.Word(),
+				Password: gofakeit.Password(true, true, true, true, false, 10),
+			},
+			passes: false,
+		},
 	}
 
 	for _, c := range cases {

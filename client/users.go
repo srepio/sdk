@@ -3,9 +3,9 @@ package client
 import (
 	"context"
 	"net/http"
+	"net/mail"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/srepio/sdk/types"
 )
 
@@ -18,9 +18,14 @@ type CreateUserRequest struct {
 func (r CreateUserRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Name, validation.Required),
-		validation.Field(&r.Email, validation.Required, is.Email),
+		validation.Field(&r.Email, validation.Required, validation.NewStringRule(isValidEmail, "must be a valid email address")),
 		validation.Field(&r.Password, validation.Required, validation.Length(10, 255)),
 	)
+}
+
+func isValidEmail(email string) bool {
+	_, err := mail.ParseAddress(email)
+	return err == nil
 }
 
 type CreateUserResponse struct {
