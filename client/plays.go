@@ -16,7 +16,7 @@ import (
 )
 
 type StartPlayRequest struct {
-	Scenario string `json:"scenario" validate:"required"`
+	Scenario string `json:"scenario"`
 }
 
 func (r StartPlayRequest) Validate() error {
@@ -39,7 +39,7 @@ func (c *Client) StartPlay(ctx context.Context, req *StartPlayRequest) (*StartPl
 }
 
 type CheckPlayRequest struct {
-	ID string `json:"id" validate:"required"`
+	ID string `json:"id"`
 }
 
 func (r CheckPlayRequest) Validate() error {
@@ -62,7 +62,7 @@ func (c *Client) CheckPlay(ctx context.Context, req *CheckPlayRequest) (*CheckPl
 }
 
 type CancelPlayRequest struct {
-	ID string `json:"id" validate:"required"`
+	ID string `json:"id"`
 }
 
 func (r CancelPlayRequest) Validate() error {
@@ -102,7 +102,7 @@ func (c *Client) GetPlays(ctx context.Context, req *GetPlaysRequest) (*GetPlaysR
 }
 
 type GetShellRequest struct {
-	ID   string `json:"id"`
+	ID   string `json:"id" param:"id"`
 	Rows uint16 `json:"rows"`
 	Cols uint16 `json:"cols"`
 }
@@ -248,7 +248,7 @@ func (c *Client) GetActivePlay(ctx context.Context, req *GetActivePlayRequest) (
 }
 
 type GetPlayRequest struct {
-	ID string `json:"id"`
+	ID string `json:"id" param:"id"`
 }
 
 func (r GetPlayRequest) Validate() error {

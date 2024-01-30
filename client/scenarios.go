@@ -30,8 +30,8 @@ func (c *Client) GetScenarios(ctx context.Context, req *GetScenariosRequest) (*G
 }
 
 type FindScenarioRequest struct {
-	Scenario string
-	Page     int
+	Scenario string `json:"scenario" param:"name"`
+	Page     int    `json:"page" query:"page"`
 }
 
 func (r FindScenarioRequest) Validate() error {
