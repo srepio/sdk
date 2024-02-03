@@ -8,5 +8,5 @@ type Scenario struct {
 	Difficulty  string   `json:"difficulty"`
 	Version     string   `json:"version"`
 	Tags        []string `json:"tags"`
-	Played      bool     `json:"played,omitempty"`
+	Played      *bool    `json:"played,omitempty"`
 }
