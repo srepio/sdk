@@ -8,6 +8,7 @@ const (
 	PlayCompleted PlayStatus = "COMPLETED"
 	PlayFailed    PlayStatus = "FAILED"
 	PlayCancelled PlayStatus = "CANCELLED"
+	PlayExpired   PlayStatus = "EXPIRED"
 )
 
 type Play struct {
